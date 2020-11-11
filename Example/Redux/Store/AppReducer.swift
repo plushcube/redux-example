@@ -8,12 +8,13 @@
 import Combine
 
 enum AppReducer {
-    static func reducer(state: inout AppState, action: ReduxAction, environment: World) -> AnyPublisher<ReduxAction, Never>? {
+    static func reducer(state: inout AppState, action: ReduxAction, environment: World) -> AnyPublisher<ReduxAction, Never> {
         switch action {
         case let main as MainAction:
             return mainReducer(state: &state, action: main, environment: environment)
         default:
-            return nil
+            return Empty(completeImmediately: true)
+                .eraseToAnyPublisher()
         }
     }
 }

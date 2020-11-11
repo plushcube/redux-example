@@ -14,7 +14,7 @@ enum MainAction: ReduxAction {
 }
 
 extension AppReducer {
-    static func mainReducer(state: inout AppState, action: MainAction, environment: World) -> AnyPublisher<ReduxAction, Never>? {
+    static func mainReducer(state: inout AppState, action: MainAction, environment: World) -> AnyPublisher<ReduxAction, Never> {
         switch action {
         case .increment:
             state.counter += 1
@@ -29,6 +29,7 @@ extension AppReducer {
             state.counter = result
             state.isCalculating = false
         }
-        return nil
+        return Empty(completeImmediately: true)
+            .eraseToAnyPublisher()
     }
 }

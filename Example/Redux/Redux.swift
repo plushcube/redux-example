@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-typealias Reducer<S: ReduxState, Environment> = (inout S, ReduxAction, Environment) -> AnyPublisher<ReduxAction, Never>?
+typealias Reducer<S: ReduxState, Environment> = (inout S, ReduxAction, Environment) -> AnyPublisher<ReduxAction, Never>
 
 protocol ReduxAction {}
 protocol ReduxState {}
@@ -27,9 +27,7 @@ final class Store<S: ReduxState, Env>: ObservableObject {
     }
 
     func dispatch(action: ReduxAction) {
-        guard let effect = reducer(&state, action, environment) else { return }
-
-        effect
+        reducer(&state, action, environment)
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: dispatch)
             .store(in: &bagOfEffects)

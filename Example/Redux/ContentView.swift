@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @EnvironmentObject private var store: Store<AppState>
+    @EnvironmentObject private var store: Store<AppState, World>
 
     var body: some View {
         VStack {
@@ -32,7 +32,11 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(
-                Store(state: AppState(), reducer: AppReducer.reducer)
+                Store(
+                    initialState: AppState(),
+                    reducer: AppReducer.reducer,
+                    environment: World()
+                )
             )
     }
 }

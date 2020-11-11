@@ -16,7 +16,7 @@
 		75614C52255B461C00701886 /* CalculatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C51255B461C00701886 /* CalculatorService.swift */; };
 		75614C57255B4B3900701886 /* MainAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C56255B4B3900701886 /* MainAction.swift */; };
 		75614C5C255B4BAF00701886 /* AppReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C5B255B4BAF00701886 /* AppReducer.swift */; };
-		75614C62255B4C4A00701886 /* CalculatorMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C61255B4C4A00701886 /* CalculatorMiddleware.swift */; };
+		75614C6A255C05FD00701886 /* World.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C69255C05FD00701886 /* World.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,7 +32,7 @@
 		75614C51255B461C00701886 /* CalculatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorService.swift; sourceTree = "<group>"; };
 		75614C56255B4B3900701886 /* MainAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainAction.swift; sourceTree = "<group>"; };
 		75614C5B255B4BAF00701886 /* AppReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReducer.swift; sourceTree = "<group>"; };
-		75614C61255B4C4A00701886 /* CalculatorMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorMiddleware.swift; sourceTree = "<group>"; };
+		75614C69255C05FD00701886 /* World.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = World.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +68,6 @@
 				75614C47255B3EB000701886 /* Redux.swift */,
 				75614C55255B4B2300701886 /* Store */,
 				75614C5E255B4C1400701886 /* Services */,
-				75614C60255B4C2C00701886 /* Middlewares */,
 				75614C36255B3E8E00701886 /* ReduxApp.swift */,
 				75614C38255B3E8E00701886 /* ContentView.swift */,
 				75614C3A255B3E8F00701886 /* Assets.xcassets */,
@@ -90,6 +89,7 @@
 		75614C55255B4B2300701886 /* Store */ = {
 			isa = PBXGroup;
 			children = (
+				75614C69255C05FD00701886 /* World.swift */,
 				75614C4A255B3EC000701886 /* AppState.swift */,
 				75614C56255B4B3900701886 /* MainAction.swift */,
 				75614C5B255B4BAF00701886 /* AppReducer.swift */,
@@ -103,14 +103,6 @@
 				75614C51255B461C00701886 /* CalculatorService.swift */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		75614C60255B4C2C00701886 /* Middlewares */ = {
-			isa = PBXGroup;
-			children = (
-				75614C61255B4C4A00701886 /* CalculatorMiddleware.swift */,
-			);
-			path = Middlewares;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -182,12 +174,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75614C6A255C05FD00701886 /* World.swift in Sources */,
 				75614C39255B3E8E00701886 /* ContentView.swift in Sources */,
 				75614C37255B3E8E00701886 /* ReduxApp.swift in Sources */,
 				75614C5C255B4BAF00701886 /* AppReducer.swift in Sources */,
 				75614C57255B4B3900701886 /* MainAction.swift in Sources */,
 				75614C48255B3EB000701886 /* Redux.swift in Sources */,
-				75614C62255B4C4A00701886 /* CalculatorMiddleware.swift in Sources */,
 				75614C4B255B3EC000701886 /* AppState.swift in Sources */,
 				75614C52255B461C00701886 /* CalculatorService.swift in Sources */,
 			);

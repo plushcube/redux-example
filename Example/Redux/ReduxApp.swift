@@ -10,11 +10,9 @@ import SwiftUI
 @main
 struct ReduxApp: App {
     private let store = Store(
-        state: AppState(),
-        middlewares: [
-            CalculatorMiddleware().execute
-        ],
-        reducer: AppReducer.reducer
+        initialState: AppState(),
+        reducer: AppReducer.reducer,
+        environment: World()
     )
 
     var body: some Scene {

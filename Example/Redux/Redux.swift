@@ -8,31 +8,37 @@
 import Combine
 import Foundation
 
-typealias Reducer<S: ReduxState> = (S, ReduxAction) -> S
-typealias Dispatcher = (ReduxAction) -> Void
-typealias Middleware<S: ReduxState> = (S, ReduxAction, @escaping Dispatcher) -> Void
+typealias SideEffect = AnyPublisher<ReduxAction, Never>
+typealias Reducer<S: ReduxState, World> = (inout S, ReduxAction, World) -> SideEffect
 
 protocol ReduxAction {}
-protocol ReduxState {}
+protocol ReduxState: Equatable {}
 
-final class Store<S: ReduxState>: ObservableObject {
+final class ReduxStore<S: ReduxState, World>: ObservableObject {
     @Published private (set) var state: S
 
-    private let reducer: Reducer<S>
-    private let middlewares: [Middleware<S>]
+    private let reducer: Reducer<S, World>
+    private let environment: World
+    private var bagOfEffects: Set<AnyCancellable> = []
 
-    init(state: S, middlewares: [Middleware<S>] = [], reducer: @escaping Reducer<S>) {
+    init(initial state: S, reducer: @escaping Reducer<S, World>, world: World) {
         self.state = state
         self.reducer = reducer
-        self.middlewares = middlewares
+        self.environment = world
     }
 
     func dispatch(action: ReduxAction) {
-        DispatchQueue.main.async {
-            self.state = self.reducer(self.state, action)
-        }
-        middlewares.forEach { mw in
-            mw(state, action, dispatch)
-        }
+        reducer(&state, action, environment)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: dispatch)
+            .store(in: &bagOfEffects)
+    }
+}
+
+extension SideEffect {
+    static let void: SideEffect = Empty().eraseToAnyPublisher()
+
+    static func dispatch(action: ReduxAction) -> SideEffect {
+        Just(action).eraseToAnyPublisher()
     }
 }

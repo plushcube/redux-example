@@ -8,4 +8,5 @@
 struct AppState: ReduxState {
     var counter = 0
     var isCalculating: Bool = false
+    var isCounting: Bool = false
 }

@@ -6,12 +6,14 @@
 //
 
 enum AppReducer {
-    static func reducer(state: AppState, action: ReduxAction) -> AppState {
+    static func reducer(state: inout AppState, action: ReduxAction, environment: World) -> SideEffect {
         switch action {
         case let main as MainAction:
-            return mainReducer(state: state, action: main)
+            return mainReducer(state: &state, action: main, environment: environment)
+        case let counter as CounterAction:
+            return counterReducer(state: &state, action: counter, environment: environment)
         default:
-            return state
+            return .void
         }
     }
 }

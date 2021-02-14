@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @EnvironmentObject private var store: Store<AppState>
+    @EnvironmentObject private var store: ReduxStore<AppState, World>
 
     var body: some View {
         VStack {
@@ -24,6 +24,9 @@ struct ContentView: View {
             Button("Calculate") {
                 store.dispatch(action: MainAction.calculate)
             }
+            Button(store.state.isCounting ? "Stop countdown" : "Run countdown") {
+                store.dispatch(action: MainAction.toggleCountdown(!store.state.isCounting))
+            }
         }
     }
 }
@@ -32,7 +35,11 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(
-                Store(state: AppState(), reducer: AppReducer.reducer)
+                ReduxStore(
+                    initial: AppState(),
+                    reducer: AppReducer.reducer,
+                    world: World()
+                )
             )
     }
 }

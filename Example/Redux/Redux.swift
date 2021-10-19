@@ -28,11 +28,27 @@ final class ReduxStore<S: ReduxState, World>: ObservableObject {
     }
 
     func dispatch(action: ReduxAction) {
-        reducer(&state, action, environment)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: dispatch)
-            .store(in: &bagOfEffects)
+        switch action as? CoreAction {
+        case let .combo(actions):
+            actions.forEach(dispatch(action:))
+
+        case let .delay(interval, action):
+            DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
+                self.dispatch(action: action)
+            }
+
+        default:
+            reducer(&state, action, environment)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveValue: dispatch)
+                .store(in: &bagOfEffects)
+        }
     }
+}
+
+enum CoreAction: ReduxAction {
+    case combo([ReduxAction])
+    case delay(TimeInterval, ReduxAction)
 }
 
 extension SideEffect {

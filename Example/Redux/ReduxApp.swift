@@ -7,9 +7,11 @@
 
 import SwiftUI
 
+typealias AppStore = ReduxStore<AppState, World>
+
 @main
 struct ReduxApp: App {
-    private let store = ReduxStore(
+    private let store = AppStore(
         initial: AppState(),
         reducer: AppReducer.reducer,
         world: World()

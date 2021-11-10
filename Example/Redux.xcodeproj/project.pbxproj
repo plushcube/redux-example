@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4A00D2B5273BF1D60097F06D /* CounterAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A00D2B4273BF1D60097F06D /* CounterAction.swift */; };
 		4A74AC6525D694F7009B40F8 /* TimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A74AC6425D694F7009B40F8 /* TimerService.swift */; };
 		75614C37255B3E8E00701886 /* ReduxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C36255B3E8E00701886 /* ReduxApp.swift */; };
 		75614C39255B3E8E00701886 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75614C38255B3E8E00701886 /* ContentView.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4A00D2B4273BF1D60097F06D /* CounterAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterAction.swift; sourceTree = "<group>"; };
 		4A74AC6425D694F7009B40F8 /* TimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerService.swift; sourceTree = "<group>"; };
 		75614C33255B3E8E00701886 /* Redux.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Redux.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75614C36255B3E8E00701886 /* ReduxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxApp.swift; sourceTree = "<group>"; };
@@ -93,8 +95,9 @@
 			children = (
 				75614C69255C05FD00701886 /* World.swift */,
 				75614C4A255B3EC000701886 /* AppState.swift */,
-				75614C56255B4B3900701886 /* MainAction.swift */,
 				75614C5B255B4BAF00701886 /* AppReducer.swift */,
+				75614C56255B4B3900701886 /* MainAction.swift */,
+				4A00D2B4273BF1D60097F06D /* CounterAction.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -181,6 +184,7 @@
 				75614C39255B3E8E00701886 /* ContentView.swift in Sources */,
 				75614C37255B3E8E00701886 /* ReduxApp.swift in Sources */,
 				4A74AC6525D694F7009B40F8 /* TimerService.swift in Sources */,
+				4A00D2B5273BF1D60097F06D /* CounterAction.swift in Sources */,
 				75614C5C255B4BAF00701886 /* AppReducer.swift in Sources */,
 				75614C57255B4B3900701886 /* MainAction.swift in Sources */,
 				75614C48255B3EB000701886 /* Redux.swift in Sources */,

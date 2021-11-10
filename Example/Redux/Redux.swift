@@ -9,7 +9,7 @@ import Combine
 import Foundation
 
 typealias SideEffect = AnyPublisher<ReduxAction, Never>
-typealias Reducer<S: ReduxState, World> = (inout S, ReduxAction, World) -> SideEffect
+typealias Reducer<S: ReduxState, Env> = (inout S, ReduxAction, Env) -> SideEffect?
 
 protocol ReduxAction {}
 protocol ReduxState: Equatable {}
@@ -17,43 +17,49 @@ protocol ReduxState: Equatable {}
 final class ReduxStore<S: ReduxState, World>: ObservableObject {
     @Published private (set) var state: S
 
-    private let reducer: Reducer<S, World>
-    private let environment: World
-    private var bagOfEffects: Set<AnyCancellable> = []
+    private let reduce: (inout S, ReduxAction) -> SideEffect?
+    private let queue: DispatchQueue
+    private var bagOfEffects: [UUID: AnyCancellable] = [:]
 
-    init(initial state: S, reducer: @escaping Reducer<S, World>, world: World) {
+    init<Env>(initial state: S, reducer: @escaping Reducer<S, Env>, world: Env, queue: DispatchQueue = .init(label: "com.plushcube.store")) {
         self.state = state
-        self.reducer = reducer
-        self.environment = world
+        self.queue = queue
+        self.reduce = { state, action in
+            reducer(&state, action, world)
+        }
     }
 
-    func dispatch(action: ReduxAction) {
-        switch action as? CoreAction {
-        case let .combo(actions):
-            actions.forEach(dispatch(action:))
+    func send(_ action: ReduxAction) {
+        guard let effect = reduce(&state, action) else { return }
 
-        case let .delay(interval, action):
-            DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
-                self.dispatch(action: action)
-            }
+        var didComplete = false
+        let uuid = UUID()
 
-        default:
-            reducer(&state, action, environment)
-                .receive(on: DispatchQueue.main)
-                .sink(receiveValue: dispatch)
-                .store(in: &bagOfEffects)
+        let cancellable = effect
+            .subscribe(on: queue)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] _ in
+                    didComplete = true
+                    self?.bagOfEffects[uuid] = nil
+                },
+                receiveValue: { [weak self] in self?.send($0) }
+            )
+
+        if !didComplete {
+            bagOfEffects[uuid] = cancellable
+        }
+    }
+
+    func send(actions: ReduxAction..., after interval: TimeInterval = 0.0) {
+        queue.asyncAfter(deadline: .now() + interval) { [weak self] in
+            guard let self = self else { return }
+            actions.forEach(self.send)
         }
     }
 }
 
-enum CoreAction: ReduxAction {
-    case combo([ReduxAction])
-    case delay(TimeInterval, ReduxAction)
-}
-
 extension SideEffect {
-    static let void: SideEffect = Empty().eraseToAnyPublisher()
-
     static func dispatch(action: ReduxAction) -> SideEffect {
         Just(action).eraseToAnyPublisher()
     }

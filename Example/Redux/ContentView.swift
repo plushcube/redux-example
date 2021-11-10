@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @EnvironmentObject private var store: ReduxStore<AppState, World>
+    @EnvironmentObject private var store: AppStore
 
     var body: some View {
         VStack {
@@ -19,13 +19,13 @@ struct ContentView: View {
                 Text("Counter is \(store.state.counter)")
             }
             Button("Increment") {
-                store.dispatch(action: MainAction.increment)
+                store.send(MainAction.increment)
             }
             Button("Calculate") {
-                store.dispatch(action: MainAction.calculate)
+                store.send(MainAction.calculate)
             }
             Button(store.state.isCounting ? "Stop countdown" : "Run countdown") {
-                store.dispatch(action: MainAction.toggleCountdown(!store.state.isCounting))
+                store.send(MainAction.toggleCountdown(!store.state.isCounting))
             }
         }
     }
@@ -35,7 +35,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(
-                ReduxStore(
+                AppStore(
                     initial: AppState(),
                     reducer: AppReducer.reducer,
                     world: World()

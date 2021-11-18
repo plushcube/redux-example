@@ -6,21 +6,26 @@
 //
 
 import Foundation
-import Combine
 
 final class TimerService {
-    private let start = CFAbsoluteTimeGetCurrent()
+    private var timer: Timer?
 
-    func tick(seconds: Int, from: Int) -> AnyPublisher<Int, Never> {
-        return Future { promise in
-            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
+    func countdown(step: Double, from: Double) async -> AsyncStream<Double> {
+        timer?.invalidate()
+        let start = CFAbsoluteTimeGetCurrent()
+        let ticks = AsyncStream(Double.self) { conti in
+            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
                 let time = CFAbsoluteTimeGetCurrent()
-                if time - self.start >= Double(seconds) {
-                    promise(.success(from - seconds))
-                    timer.invalidate()
+                if time - start >= step {
+                    let next = max(from - step, 0.0)
+                    conti.yield(next)
+                    if abs(next) < 0.001 {
+                        conti.finish()
+                        timer.invalidate()
+                    }
                 }
             }
         }
-        .eraseToAnyPublisher()
+        return ticks
     }
 }

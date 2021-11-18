@@ -6,6 +6,5 @@
 //
 
 struct World {
-    let calculator = CalculatorService()
     func timer() -> TimerService { TimerService() }
 }

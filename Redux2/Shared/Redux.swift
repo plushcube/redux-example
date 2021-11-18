@@ -1,6 +1,6 @@
 //
 //  Redux.swift
-//  Redux2
+//  Redux
 //
 //  Created by Andrei Chevozerov on 18.11.2021.
 //
@@ -17,8 +17,6 @@ final class ReduxStore<S: ReduxState, A: ReduxAction, E>: ObservableObject {
     private let reduce: (inout S, A) async throws -> A?
     private let world: E
 
-    private var bag: Set<AnyCancellable> = []       // TODO: Get rid of it.
-
     init(initial state: S, reducer: Reducer<S, A, E>, environment: E) {
         self.state = state
         self.world = environment
@@ -28,7 +26,13 @@ final class ReduxStore<S: ReduxState, A: ReduxAction, E>: ObservableObject {
     }
 
     @MainActor func update(state updated: S) {
+        guard state != updated else { return }
         state = updated
+    }
+
+    @MainActor func update<DS: ReduxState>(substate keyPath: WritableKeyPath<S, DS>, with value: DS) {
+        guard state[keyPath: keyPath] != value else { return }
+        state[keyPath: keyPath] = value
     }
 
     func send(_ actions: A..., after delay: TimeInterval = 0.0) async throws {
@@ -45,28 +49,35 @@ final class ReduxStore<S: ReduxState, A: ReduxAction, E>: ObservableObject {
         }
     }
 
-    func derived<DS: ReduxState, EA: ReduxAction>(
-        deriveState: @escaping (S) -> DS,
-        reducer: Reducer<DS, EA, E>
-    ) -> ReduxStore<DS, EA, E> {
-        let ds = ReduxStore<DS, EA, E>(
-            initial: deriveState(state),
+    private var bag: Set<AnyCancellable> = []
+
+    func derived<DS: ReduxState, DA: ReduxAction>(
+        _ keyPath: WritableKeyPath<S, DS>,
+        reducer: Reducer<DS, DA, E>
+    ) -> ReduxStore<DS, DA, E> {
+        let ds = ReduxStore<DS, DA, E>(
+            initial: state[keyPath: keyPath],
             reducer: reducer,
             environment: world)
-
-        // TODO: Update parent store state on derived change
-
-        // TODO: Find a way how to do it more gracefully
-        $state
-            .map(deriveState)
+        ds.$state
             .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                Task {
+                    await self.update(substate: keyPath, with: value)
+                }
+            }
+            .store(in: &bag)
+        $state
+            .map(keyPath)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .sink { value in
                 Task {
                     await ds.update(state: value)
                 }
             }
             .store(in: &bag)
-
         return ds
     }
 }

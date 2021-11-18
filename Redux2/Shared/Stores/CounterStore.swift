@@ -27,7 +27,6 @@ extension CounterStore {
         case .reset:
             state.value = 0
         }
-        print("\(state.value)")
         return nil
     }
 }

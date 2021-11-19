@@ -26,12 +26,10 @@ final class ReduxStore<S: ReduxState, A: ReduxAction, E>: ObservableObject {
     }
 
     @MainActor func update(state updated: S) {
-        guard state != updated else { return }
         state = updated
     }
 
     @MainActor func update<DS: ReduxState>(substate keyPath: WritableKeyPath<S, DS>, with value: DS) {
-        guard state[keyPath: keyPath] != value else { return }
         state[keyPath: keyPath] = value
     }
 
@@ -49,7 +47,16 @@ final class ReduxStore<S: ReduxState, A: ReduxAction, E>: ObservableObject {
         }
     }
 
+    func send(global action: ReduxAction) async throws {
+        if let own = action as? A {
+            try await send(own)
+            return
+        }
+        try await sendToParent(action)
+    }
+
     private var bag: Set<AnyCancellable> = []
+    private var sendToParent: (ReduxAction) async throws -> Void = { _ in }
 
     func derived<DS: ReduxState, DA: ReduxAction>(
         _ keyPath: WritableKeyPath<S, DS>,
@@ -62,17 +69,20 @@ final class ReduxStore<S: ReduxState, A: ReduxAction, E>: ObservableObject {
         ds.$state
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { value in
+            .sink { [weak self] value in
+                guard let self = self, self.state[keyPath: keyPath] != value else { return }
                 Task {
                     await self.update(substate: keyPath, with: value)
                 }
             }
             .store(in: &bag)
+        ds.sendToParent = send(global:)
         $state
             .map(keyPath)
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { value in
+            .sink { [weak self] value in
+                guard self?.state[keyPath: keyPath] != value else { return }
                 Task {
                     await ds.update(state: value)
                 }

@@ -18,7 +18,8 @@ struct TimerView: View {
         }
         Button(store.state.state == .idle ? "Run countdown" : "Stop countdown") {
             Task {
-                try? await store.send(.runCountdown)
+//                try? await store.send(.runCountdown)
+                try? await store.send(global: AppAction.updated)
             }
         }
         .buttonStyle(.bordered)
